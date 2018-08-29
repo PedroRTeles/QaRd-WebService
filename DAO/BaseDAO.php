@@ -7,7 +7,7 @@
 
       public function __construct()
       {
-          include("config.php");
+          include("config.php"); //Create config.php in the same folder
           $this->config = $config;
           $this->connect();
       }
