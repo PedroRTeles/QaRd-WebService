@@ -12,8 +12,13 @@ $response = array();
 
 switch ($requestId) {
 	case 1:
-	registerCheckin($_REQUEST["idEmployee"], $db->getConnection());
-	break;
+		registerCheckin($_REQUEST["idEmployee"], $db->getConnection());
+		break;
+
+	default:
+		$response["code"] = 0;
+		echo json_encode($response);
+		break;
 }
 
 function registerCheckin($idEmployee, $connection) {
