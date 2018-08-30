@@ -10,9 +10,14 @@ $db = new BaseDAO();
 
 $response = array();
 
-switch ($requestId) {
+switch ($requestId)
+{
 	case 1:
 		registerCheckin($_REQUEST["idEmployee"], $db->getConnection());
+		break;
+
+	case 2:
+		nextCheckin($_REQUEST["idEmployee"], $db->getConnection());
 		break;
 
 	default:
@@ -21,7 +26,8 @@ switch ($requestId) {
 		break;
 }
 
-function registerCheckin($idEmployee, $connection) {
+function registerCheckin($idEmployee, $connection)
+{
 	$statementSelect = $connection->prepare("SELECT type FROM checkin WHERE idEmployee = ? ORDER BY checkinTimestamp DESC LIMIT 1");
 	$statementSelect->bind_param("i", $idEmployee);
 	$statementSelect->execute();
@@ -103,6 +109,53 @@ function authenticateCheckin($connection)
 
 	$statementSelect->close();
 	$statementInsert->close();
+}
+
+function nextCheckin($idEmployee, $connection)
+{
+	$statementSelect = $connection->prepare("SELECT type FROM checkin WHERE idEmployee = ? ORDER BY checkinTimestamp DESC LIMIT 1");
+	$statementSelect->bind_param("i", $idEmployee);
+
+	$statementSelect->execute();
+	$statementSelect->store_result();
+
+	if($statementSelect->num_rows == 1)
+	{
+		$statementSelect->bind_result($lastType);
+		$statementSelect->fetch();
+	}
+	else
+	{
+		$lastType = 4;
+	}
+
+	switch($lastType)
+	{
+		case 1:
+			$response["code"] = 2;
+			break;
+
+		case 2:
+			$response["code"] = 3;
+			break;
+
+		case 3:
+			$response["code"] = 4;
+			break;
+
+		case 4:
+			$response["code"] = 1;
+			break;
+
+		default:
+			$response["code"] = 0;
+			break;
+	}
+
+	$statementSelect->close();
+
+	echo json_encode($response);
+
 }
 
 ?>
